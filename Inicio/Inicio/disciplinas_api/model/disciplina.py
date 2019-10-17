@@ -1,8 +1,10 @@
 # Exceção lançada quando se tenta associar um ID a uma entidade que já possui um.
 class NaoTransienteException(Exception):
+    ''' Objeto não existente no banco '''
     pass
 
 class AlunoJaInclusoException(Exception):
+    ''' Aluno já incluso '''
     pass
 
 class Disciplina():
@@ -30,8 +32,8 @@ class Disciplina():
             print(e)
     
     def associar_alunos(self, alunos):
-        if self.alunos != None:
-            raise NaoTransienteException
+        if len(self.alunos) == 0:
+            raise AlunoJaInclusoException
         self.alunos = alunos
     
     def remover_aluno(self, aluno_id):
