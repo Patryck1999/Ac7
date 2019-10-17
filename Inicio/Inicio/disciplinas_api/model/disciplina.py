@@ -22,7 +22,7 @@ class Disciplina():
     
     def incluir_aluno(self, aluno_id):
         try:
-            for aluno in range self.alunos:
+            for aluno in self.alunos:
                 if aluno == aluno_id:
                     raise AlunoJaInclusoException
 

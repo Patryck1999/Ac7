@@ -77,7 +77,7 @@ def alterar_disciplina(id):
         return jsonify(disciplina_atualizada), 200
     return jsonify({'erro':'disciplina nao foi atualizada'}), 400
 
-@disciplinas_app.route('site/disciplinas/<int:id>', methods=['PUT'])
+@disciplinas_app.route('/site/disciplinas/<int:id>', methods=['PUT'])
 def alterar_disciplina_site(id):
     disciplina_atualizada = service_atualiza(id)
     if disciplina_atualizada != None:
