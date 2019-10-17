@@ -50,17 +50,19 @@ def resetar():
         dao_remover(disciplina)
 
 def cadastrar_aluno(dados):
-    disciplina = localizar_disciplina(dados['id'])
+    disciplina = localizar_disciplina(dados['disciplina_id'])
     aluno_id = dados['aluno_id']
-    return dao_cadastrar(disciplina, aluno_id)
+    return dao_cadastrar(disciplina, aluno_id).__dict__()
 
     
 def remover_aluno(dados):
-    disciplina = localizar_disciplina(dados['id'])
+    disciplina = localizar_disciplina(dados['disciplina_id'])
+    disciplina.associar_alunos(dao_consultar_alunos(disciplina))
     aluno_id = dados['aluno_id']
-    return dao_remover(disciplina, aluno_id)
-
+    disciplina = dao_remover_aluno(disciplina, aluno_id)
+    return disciplina.__dict__() if disciplina != None else None
+  
     
 def consultar_alunos(dados):
-    disciplina = localizar_disciplina(dados['id'])
-    return dao_consultar_alunos(disciplina)
+    disciplina = localizar_disciplina(dados['disciplina_id'])
+    return dao_consultar_alunos(disciplina).__dict__()

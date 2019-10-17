@@ -68,6 +68,7 @@ class Disciplina():
         d['id'] = self.id
         d['nome'] = self.nome
         d['professor_id'] = self.professor_id
+        d['alunos'] = self.alunos
         return d
 
     @staticmethod
