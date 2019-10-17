@@ -3,7 +3,7 @@ import sqlite3
 db_name = "disciplinas.db"
 table_name = "disciplina"
 
-sql_create_table = f"CREATE TABLE IF NOT EXISTS {table_name} ...;"
+sql_create_table = f"CREATE TABLE IF NOT EXISTS {table_name} (id integer PRIMARY KEY AUTOINCREMENT, nome text NOT NULL UNIQUE, id_professor integer NOT NULL UNIQUE);"
 
 def createTable(cursor, sql):
     cursor.execute(sql)
