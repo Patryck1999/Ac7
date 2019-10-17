@@ -41,7 +41,7 @@ def atualizar(dados):
     if localizar_por_nome(dados['nome']) != None:
         disciplina = Disciplina.criar(dados)
         dao_alterar(disciplina)
-        return localizar(disciplina.id)
+        return disciplina.__dict__()
     return None
     
 def resetar():
@@ -50,17 +50,17 @@ def resetar():
         dao_remover(disciplina)
 
 def cadastrar_aluno(dados):
-    disciplina = Disciplina(dados['id'])
+    disciplina = localizar_disciplina(dados['id'])
     aluno_id = dados['aluno_id']
     return dao_cadastrar(disciplina, aluno_id)
 
     
 def remover_aluno(dados):
-    disciplina = Disciplina(dados['id'])
+    disciplina = localizar_disciplina(dados['id'])
     aluno_id = dados['aluno_id']
     return dao_remover(disciplina, aluno_id)
 
     
 def consultar_alunos(dados):
-    disciplina = Disciplina(dados['id'])
+    disciplina = localizar_disciplina(dados['id'])
     return dao_consultar_alunos(disciplina)
