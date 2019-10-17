@@ -39,7 +39,7 @@ def consultar_por_nome(nome):
 def cadastrar(disciplina):
         with closing(con()) as connection, closing(connection.cursor()) as cursor:
                 sql = f"INSERT INTO {model_name} (nome, id_professor) VALUES (?, ?)"
-                cursor.execute(sql, (disciplina.nome, disciplina.id_professor))
+                cursor.execute(sql, (disciplina.nome, disciplina.professor_id))
                 connection.commit()
                 if cursor.lastrowid:
                         disciplina.associar_id(cursor.lastrowid)
@@ -50,7 +50,7 @@ def cadastrar(disciplina):
 def alterar(disciplina):
         with closing(con()) as connection, closing(connection.cursor()) as cursor:
                 sql = f"UPDATE {model_name} SET nome = ?, id_professor = ? WHERE id = ?"
-                cursor.execute(sql, (disciplina.nome, disciplina.id_professor, disciplina.id))
+                cursor.execute(sql, (disciplina.nome, disciplina.professor_id, disciplina.id))
                 connection.commit()
                 if cursor.rowcount > 0:
                         return True
