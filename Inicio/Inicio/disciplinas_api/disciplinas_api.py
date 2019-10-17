@@ -29,7 +29,7 @@ disciplinas_app.debug = True
 def listar_alunos():
     return Req.get('http://localhost:5001/alunos').json()
 
-def renderizar_pagina(disciplina='', alunos_disciplina='', msg_cadastrar_pre='', msg_remover_pre='', msg_aluno_cadastar_pre='', msg_aluno_remover_pre='', msg_aluno_listar_pre=msg_aluno_listar):
+def renderizar_pagina(disciplina='', alunos_disciplina='', msg_cadastrar_pre='', msg_editar_pre='', msg_remover_pre='', msg_aluno_cadastar_pre='', msg_aluno_remover_pre='', msg_aluno_listar_pre=msg_aluno_listar):
     alunos = listar_alunos()
     return render_template( \
         "index.html", \
@@ -38,44 +38,77 @@ def renderizar_pagina(disciplina='', alunos_disciplina='', msg_cadastrar_pre='',
         alunos=alunos if alunos != None else [], \
         alunos_disciplina = alunos_disciplina)
 
+def internal_cadastrar_disciplina(dados_disciplina):
+    disciplina = service_criar(dados_disciplina)
+    return disciplina
     
 @disciplinas_app.route('/disciplinas')
 def listar_disciplinas():
-    pass
+    lista = service_listar()
+    return jsonify(lista)
 
 @disciplinas_app.route('/disciplinas', methods=['POST'])
 def cadastrar_disciplina():
-    pass
+    if request.form:
+        nova_disciplina = {"nome" :request.form["nome"], "professor" : request.form["professor"]}
+    else:
+        nova_disciplina = request.get_json()
+    if nova_disciplina == None:
+        return jsonify({'erro':'dados não informados corretamente:', 'dados':nova_disciplina}), 400
+    disciplina = internal_cadastrar_disciplina(nova_disciplina)
+    if disciplina == None:
+        return jsonify({'erro':'disciplina ja existe'}), 400
+    return jsonify(disciplina)
     
 @disciplinas_app.route('/site/disciplinas', methods=['POST'])
 def cadastrar_disciplina_site():
-    #implementar
-    #return renderizar_pagina(msg_cadastrar_pre="Disciplina não pôde ser cadastrada! ")
-    #return renderizar_pagina()
+    if request.form["nome"] == None or request.form["professor"] == None:
+        return renderizar_pagina("index.html", msg_cadastrar_pre = msg_cadastrar)
+    nova_disciplina = {"nome" :request.form["nome"], "professor" : request.form["professor"]}
+    disciplina = internal_cadastrar_disciplina(nova_disciplina)
+    if disciplina == None:
+        return renderizar_pagina("index.html", msg_cadastrar_pre = 'Não foi possível cadastrar a disciplina!')
+    return renderizar_pagina("index.html", msg_cadastrar_pre = 'Disciplina cadastrada com sucesso!')
 
 @disciplinas_app.route('/disciplinas/<int:id>', methods=['PUT'])
 def alterar_disciplina(id):
-    disciplina_data = request.get_json()
-    if ('nome' not in disciplina_data):
-        return jsonify({'erro':'disciplina sem nome'}), 400
-    if ('professor' not in disciplina_data):
-        return jsonify({'erro':'disciplina sem professor'}), 400
-    pass
-    
+    disciplina_atualizada = service_atualiza(id)
+    if disciplina_atualizada != None:
+        return jsonify(disciplina_atualizada), 200
+    return jsonify({'erro':'disciplina nao foi atualizada'}), 400
+
+@disciplinas_app.route('site/disciplinas/<int:id>', methods=['PUT'])
+def alterar_disciplina_site(id):
+    disciplina_atualizada = service_atualiza(id)
+    if disciplina_atualizada != None:
+        return renderizar_pagina("index.html", msg_editar_pre = 'Disciplina atualizada com sucesso!')
+    return renderizar_pagina("index.html", msg_editar_pre = 'Não foi possível editar a disciplina!')
+
 @disciplinas_app.route('/disciplinas/<int:id>', methods=['GET'])
 def localizar_disciplina(id):
-    pass
+    disciplina = service_localiza(id)
+    if disciplina != None:
+        return jsonify(disciplina_atualizada), 200
+    return jsonify({'erro':'disciplina nao encontrada'}), 400
 
 @disciplinas_app.route('/disciplinas/<int:id>', methods=['DELETE'])
 def remover_disciplina(id):
-    pass
+    removida = service_remover(id)
+    if removida == 1:
+        return jsonify(removida), 202
+    return jsonify({'erro':'disciplina nao encontrada'}), 400
 
-@disciplinas_app.route('/site/disciplinas/delete', methods=['POST'])
+@disciplinas_app.route('/site/disciplinas/delete', methods=['DELETE'])
 def remover_disciplina_site():
     id = request.form["id"]
     if id == None:
-        return render_template("index.html", disciplinas=service_listar(), mensagem = msg_cadastrar,msg_remover="Informe um Id válido para remover uma disciplina! " + msg_remover)
+        return renderizar_pagina("index.html", msg_remover_pre = msg_remover)
     #Implementar
+    removida = service_remover(id)
+    if removida == 1:
+        return renderizar_pagina("index.html", msg_remover_pre = 'Disciplina removida com sucesso!')
+    return renderizar_pagina("index.html", msg_remover_pre = 'Não foi possível remover a disciplina!')
+
 
 @disciplinas_app.route('/disciplinas/resetar', methods=['DELETE'])
 def resetar():
@@ -84,41 +117,59 @@ def resetar():
 
 @disciplinas_app.route('/')
 def all():
-    return renderizar_pagina()
+    return renderizar_pagina("index.html")
 
 @disciplinas_app.route('/disciplinas/<int:disciplina_id>/alunos/listar', methods=['GET'])
 def listar_alunos_por_disciplina(disciplina_id):
-    pass
+    alunos = service_consultar_alunos(disciplina_id)
+    if alunos != None:
+        return jsonify(alunos), 200
+    return jsonify({'erro':'alunos nao encontrados'}), 400
 
 @disciplinas_app.route('/site/disciplinas/alunos/listar', methods=['POST'])
 def listar_alunos_por_disciplina_site():
     disciplina_id = request.form["disciplinaid"]
-    pass
-    #implementar
+    alunos = service_consultar_alunos(disciplina_id)
+    if alunos != None:
+        return renderizar_pagina("index.html", alunos_disciplina = alunos)
+    return renderizar_pagina("index.html", msg_aluno_listar_pre = 'Não foi possível localizar alunos por disciplina')
 
 @disciplinas_app.route('/disciplinas/alunos', methods=['POST'])
 def cadastrar_aluno_por_disciplina():
     dados = request.get_json()
-    pass
-    #implementar
+    aluno_por_disciplina = service_cadastrar_aluno(dados)
+    if aluno_por_disciplina != None:
+        return jsonify(aluno_por_disciplina), 200
+    return jsonify({'erro':'Não foi possível cadastrar este aluno nesta disciplina'}), 500
+
     
 @disciplinas_app.route('/site/disciplinas/alunos', methods=['POST'])
 def cadastar_aluno_por_disciplina_site():
     disciplina_id = request.form["disciplinaid"]
-    pass
-    #implementar
+    aluno_por_disciplina = service_cadastrar_aluno(disciplina_id)
+    if aluno_por_disciplina != None:
+        return renderizar_pagina("index.html", msg_aluno_cadastar_pre= msg_aluno_cadastar)
+    return renderizar_pagina("index.html", msg_aluno_cadastar_pre = 'Não foi possível cadastrar este aluno nesta disciplina')
+
 
 @disciplinas_app.route('/disciplinas/<int:disciplina_id>/alunos/<int:aluno_id>', methods=['DELETE'])
 def remover_aluno_por_disciplina(disciplina_id, aluno_id):
-    pass
-    #implementar
+    dados = [disciplina_id, aluno_id]
+    aluno_removido = service_remover_aluno(dados)
+    if aluno_removido != None:
+        return jsonify(aluno_removido), 202
+    return jsonify('Nao foi possivel remover este aluno nesta disciplina'), 500
+
     
 @disciplinas_app.route('/site/disciplinas/alunos/delete', methods=['POST'])
 def remover_aluno_por_disciplina_site():
     disciplina_id = request.form["disciplinaid"]
-    pass
-    #implementar
+    aluno_id = request.form["alunoid"]
+    dados = [disciplina_id, aluno_id]
+    aluno_removido = service_remover_aluno(disciplina_id)
+    if aluno_removido != None:
+        return renderizar_pagina("index.html", msg_aluno_remover_pre= 'Aluno removido com sucesso nesta disciplina!')
+    return renderizar_pagina("index.html", msg_aluno_remover_pre = 'Não foi possível remover este aluno nesta disciplina')
     
 if __name__ == '__main__':
     disciplinas_app.run(host='localhost', port=5003)
-    
