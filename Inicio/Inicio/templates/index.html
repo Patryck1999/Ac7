@@ -1,32 +1,89 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Sala de Aula</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <title>Sala de Aula - Disciplinas</title>
     </head>
     <body>
-        <p><b>Lista de Professores</b></p>
-        <div id="professores">
-        {% for item in professores %}
-        <li>ID: {{ item['id'] }}, Nome: {{ item['nome'] }}</b></li>
-        {% endfor %}
-        </div>
-        
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">LMS Impacta</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Disciplina
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="disciplina/criar.html">Criar</a>
+                    <a class="dropdown-item" href="disciplina/listar.html">Visualizar</a>
+                    </div>
+                </li>
+                </ul>
+            </div>
+        </nav>
+        <H2>Gerenciar alunos por Disciplina</H2>
+        <H3>Cadastro de alunos por Disciplina</H3>
+        <p><b>{{mensagem_aluno_cadastar}}</b></p>
         <br>
-        
-        <p><b>Lista de Disciplinas</b></p>
-        <div id="disciplinas">
-        {% for item in disciplinas %}
-        <li>ID: {{ item['id'] }}, Nome: {{ item['nome'] }}</b></li>
+        <form action="/site/disciplinas/alunos" method="POST">
+            <table>
+            <tr>
+            <td>Id da disciplina:</td><td><input type="text" id="disciplinaid" name="disciplinaid" autocomplete="off" /></td>
+            </tr>
+            <tr>
+            <td>Id do aluno:</td><td><input type="text" id="alunoid" name="alunoid" autocomplete="off" /></td>
+            </tr>
+            </table>
+            <br>
+            <button type="submit">Cadastrar aluno na Disciplina!</button>
+            <br>
+            <br>
+            <br>
+        </form>
+        <H2>{{msg_aluno_listar}}</H2>
+        <H3>Selecione uma disciplina para listar os alunos:</H3>
+        <form action="/site/disciplinas/alunos/listar" method="POST">
+            <table>
+            <tr>
+            <td>Id da disciplina:</td><td><input type="text" id="disciplinaid" name="disciplinaid" autocomplete="off" size="1"/></td>
+            </tr>
+            </table>
+            <br>
+            <button type="submit">Listar alunos da disciplina!</button>
+            <br>
+            <br>
+        </form>
+        <div id="alunosdisciplina">
+        {% for item in alunos_disciplina %}
+        <li>ID: {{ item['id'] }}, Nome: {{ item['nome'] }}, Matrícula: {{ item['matricula'] }}</b></li>
         {% endfor %}
         </div>
-        
-        <br>
-        
-        <p><b>Lista de Alunos</b></p>
-        <div id="alunos">
-        {% for item in alunos %}
-        <li>ID: {{ item['id'] }}, Nome: {{ item['nome'] }}</b></li>
-        {% endfor %}
-        </div>
+        <H3>Remover aluno de uma Disciplina</H3>
+        <p><b>{{mensagem_aluno_remover}}</b></p>
+        <form action="/site/disciplinas/alunos/delete" method="POST">
+            <table>
+            <tr>
+            <td>Id da disciplina:</td><td><input type="text" id="disciplinaid" name="disciplinaid" autocomplete="off" size="1"/></td>
+            </tr>
+            <tr>
+            <td>Id do aluno:</td><td><input type="text" id="alunoid" name="alunoid" autocomplete="off" size="1"/></td>
+            </tr>
+            </table>
+            <br>
+            <button type="submit">Remover aluno da disciplina!</button>
+            <br>
+            <br>
+            <br>
+        </form>
     </body>
 </html>

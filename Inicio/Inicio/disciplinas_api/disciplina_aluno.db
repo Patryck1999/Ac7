@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS disciplina_aluno (id_disciplina integer NOT NULL UNIQUE , id_aluno integer NOT NULL UNIQUE);
