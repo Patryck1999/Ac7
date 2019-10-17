@@ -10,22 +10,33 @@ def con():
     return sqlite3.connect(db_name)
 
 def listar():
-    with closing(con()) as connection, closing(connection.cursor()) as cursor:
-        cursor.execute(f"SELECT id, nome, professor_id FROM {model_name}")
-        pass
+        with closing(con()) as connection, closing(connection.cursor()) as cursor:
+                cursor.execute(f"SELECT id, nome, id_professor FROM {model_name}")
+                rows = cursor.fetchall()
+                registros = []
+                for (id, nome, id_professor) in rows:
+                        disciplina = Disciplina.criar_com_id(id, nome, id_professor)
+                if disciplina != None:
+                        registros.append(disciplina)
+                return registros
 
 def consultar(id):
-    pass
+        with closing(con()) as connection, closing(connection.cursor()) as cursor:
+                cursor.execute(f"SELECT id, nome, id_professor FROM {model_name} WHERE id = ?", (id,))
+                row = cursor.fetchone()
+                if row == None:
+                        return None
+                return Professor.criar_com_id(row[0],row[1],row[2])
 
 def consultar_por_nome(nome):
     with closing(con()) as connection, closing(connection.cursor()) as cursor:
-        cursor.execute(f"SELECT id, nome, professor_id FROM {model_name} WHERE nome = ?", (nome,))
+        cursor.execute(f"SELECT id, nome, id_professor FROM {model_name} WHERE nome = ?", (nome,))
         pass
 
 def cadastrar(disciplina):
     with closing(con()) as connection, closing(connection.cursor()) as cursor:
-        sql = f"INSERT INTO {model_name} (nome, professor_id) VALUES (?, ?)"
-        result = cursor.execute(sql, (disciplina.nome, disciplina.professor_id))
+        sql = f"INSERT INTO {model_name} (nome, id_professor) VALUES (?, ?)"
+        result = cursor.execute(sql, (disciplina.nome, disciplina.id_professor))
         connection.commit()
         if cursor.lastrowid:
             disciplina.associar_id(cursor.lastrowid)
@@ -34,7 +45,11 @@ def cadastrar(disciplina):
             return None
 
 def alterar(disciplina):
-    pass
+    with closing(con()) as connection, closing(connection.cursor()) as cursor:
+        sql = f"UPDATE {model_name} SET nome = ?, id_professor = ? WHERE id = ?"
+        result = cursor.execute(sql, (disciplina.nome, disciplina.id_professor, disciplina.id))
+        connection.commit()
+        return result
 
 def remover(disciplina):
     pass
