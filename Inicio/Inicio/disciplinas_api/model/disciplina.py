@@ -20,6 +20,10 @@ class Disciplina():
     
     def incluir_aluno(self, aluno_id):
         try:
+            for aluno in range self.alunos:
+                if aluno == aluno_id:
+                    raise AlunoJaInclusoException
+
             self.alunos.append(aluno_id)
         except Exception as e:
             print("Problema ao incluir aluno na disciplina!")
