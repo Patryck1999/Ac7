@@ -14,33 +14,76 @@ class Disciplina():
         self.alunos = []
     
     def associar_id(self, id):
-        pass
+        if self.id != None:
+            raise NaoTransienteException
+        self.id = id
     
     def incluir_aluno(self, aluno_id):
-        pass
+        try:
+            for aluno in range self.alunos:
+                if aluno == aluno_id:
+                    raise AlunoJaInclusoException
+
+            self.alunos.append(aluno_id)
+        except Exception as e:
+            print("Problema ao incluir aluno na disciplina!")
+            print(e)
     
     def associar_alunos(self, alunos):
-        pass
+        if self.alunos != None:
+            raise NaoTransienteException
+        self.alunos = alunos
     
     def remover_aluno(self, aluno_id):
-        pass
+        try:
+            self.alunos.remove(aluno_id)
+        except Exception as e:
+            print("Problema ao remover aluno da disciplina!")
+            print(e)
     
     def verificar_transiente(self):
-        pass
+        if self.id != None:
+            return False
+        return True
     
     def validar(self):
-        pass
+        if self.nome != None and self.professor_id != None:
+            return True
+        return False
     
     def atualizar(self, dados):
-        pass
+        try:
+            nome = dados["nome"]
+            professor_id = dados["professor_id"]
+            self.nome, self.professor_id = nome, professor_id
+            return self
+        except Exception as e:
+            print("Problema ao atualizar!")
+            print(e)
 
     def __dict__(self):
-        pass
+        d = dict()
+        d['id'] = self.id
+        d['nome'] = self.nome
+        d['professor_id'] = self.professor_id
+        return d
 
     @staticmethod
     def criar(dados):
-        pass
+        try:
+            nome = dados["nome"]
+            professor_id = dados["professor_id"]
+            return Professor(nome=nome, professor_id=professor_id)
+        except Exception as e:
+            print("Problema ao criar nova disciplina!")
+            print(e)
     
     @staticmethod    
     def criar_com_id(id, nome, professor_id):
-        pass
+        try:
+            disciplina = Disciplina(nome=nome, professor_id=professor_id)
+            disciplina.associar_id(id)
+            return disciplina
+        except Exception as e:
+            print("Problema ao criar nova disciplina!")
+            print(e)
